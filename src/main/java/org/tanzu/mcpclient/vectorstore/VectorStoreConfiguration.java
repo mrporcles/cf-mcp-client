@@ -54,13 +54,21 @@ public class VectorStoreConfiguration {
             logger.info("No embedding model configured, using default dimensions: {}", dimensions);
         }
 
+        // Get environment variable for table name suffix
+        String envSuffix = System.getenv("CF_USERNAME");
+        String tableName = envSuffix != null && !envSuffix.trim().isEmpty() 
+            ? "vector_store_" + envSuffix.trim().toLowerCase()
+            : "vector_store";
+        
+        logger.info("Using vector store table name: {}", tableName);
+
         return PgVectorStore.builder(jdbcTemplate, embeddingModel)
                 .dimensions(dimensions)
                 .distanceType(COSINE_DISTANCE)
                 .indexType(HNSW)
                 .initializeSchema(true)
                 .schemaName("public")
-                .vectorTableName("vector_store")
+                .vectorTableName(tableName)
                 .maxDocumentBatchSize(10000)
                 .build();
     }
