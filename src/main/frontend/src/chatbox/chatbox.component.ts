@@ -27,7 +27,13 @@ import {PlatformMetrics} from '../app/app.component';
 import {MatTooltip} from '@angular/material/tooltip';
 import {MatExpansionModule} from '@angular/material/expansion';
 import {ThinkTagParser} from './think-tag-parser';
-import {A2AAgent} from '../app/app.component';
+// A2AAgent functionality removed
+interface A2AAgent {
+  serviceName: string;
+  agentName: string;
+  healthy: boolean;
+  capabilities: { streaming: boolean };
+}
 
 interface ErrorInfo {
   message: string;
@@ -89,7 +95,6 @@ export class ChatboxComponent implements OnDestroy, AfterViewInit {
     embeddingModel: '',
     vectorStoreName: '',
     mcpServers: [],
-    a2aAgents: [],
     memoryType: 'TRANSIENT'
   });
 
@@ -408,6 +413,7 @@ export class ChatboxComponent implements OnDestroy, AfterViewInit {
     }
   }
 
+  // Agent functionality removed - method disabled (kept for compatibility)
   async sendMessageToAgent(agent: A2AAgent, message: string): Promise<void> {
     // Add user message to chat
     this._messages.update(msgs => [
@@ -431,6 +437,7 @@ export class ChatboxComponent implements OnDestroy, AfterViewInit {
    * Sends a message to an agent using streaming (SSE) for real-time status updates.
    * Only used when agent.capabilities.streaming is true.
    */
+  // Agent functionality removed - method disabled (kept for compatibility)
   private async sendMessageToAgentStreaming(agent: A2AAgent, message: string): Promise<void> {
     // Add placeholder for agent response
     this._messages.update(msgs => [
@@ -599,6 +606,7 @@ export class ChatboxComponent implements OnDestroy, AfterViewInit {
    * Sends a message to an agent using blocking request (no streaming).
    * Used as fallback when agent.capabilities.streaming is false.
    */
+  // Agent functionality removed - method disabled (kept for compatibility)
   private async sendMessageToAgentBlocking(agent: A2AAgent, message: string): Promise<void> {
     // Add placeholder for agent response
     this._messages.update(msgs => [

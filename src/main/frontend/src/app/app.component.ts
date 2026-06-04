@@ -4,7 +4,6 @@ import { ChatPanelComponent } from '../chat-panel/chat-panel.component';
 import { MemoryPanelComponent } from '../memory-panel/memory-panel.component';
 import { DocumentPanelComponent } from '../document-panel/document-panel.component';
 import { McpServersPanelComponent } from '../mcp-servers-panel/mcp-servers-panel.component';
-import { AgentsPanel } from '../agents-panel/agents-panel';
 import { ChatboxComponent } from '../chatbox/chatbox.component';
 import { NavigationRailComponent } from './navigation-rail/navigation-rail.component';
 import { BottomNavigationComponent } from './bottom-navigation/bottom-navigation';
@@ -17,7 +16,7 @@ import { startWith, switchMap, retry, shareReplay, catchError, of } from 'rxjs';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [MatToolbar, ChatPanelComponent, MemoryPanelComponent, DocumentPanelComponent, McpServersPanelComponent, AgentsPanel, ChatboxComponent, NavigationRailComponent, BottomNavigationComponent],
+  imports: [MatToolbar, ChatPanelComponent, MemoryPanelComponent, DocumentPanelComponent, McpServersPanelComponent, ChatboxComponent, NavigationRailComponent, BottomNavigationComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
@@ -52,7 +51,6 @@ export class AppComponent {
             embeddingModel: '',
             vectorStoreName: '',
             mcpServers: [],
-            a2aAgents: [],
             memoryType: 'TRANSIENT' as const
           });
         })
@@ -69,7 +67,6 @@ export class AppComponent {
       embeddingModel: '',
       vectorStoreName: '',
       mcpServers: [],
-      a2aAgents: [],
       memoryType: 'TRANSIENT' as const
     }
   });
@@ -89,10 +86,6 @@ export class AppComponent {
     this._currentDocumentIds.set([...documentIds]);
   }
 
-  // Method to handle agent message sending
-  onAgentMessageSent(agent: A2AAgent, message: string): void {
-    this.chatbox?.sendMessageToAgent(agent, message);
-  }
 
   private getApiBaseUrl(): { protocol: string; host: string } {
     let host: string;
@@ -126,29 +119,11 @@ export interface McpServer {
   }; // New optional field for protocol object
 }
 
-export interface AgentCapabilities {
-  streaming: boolean;
-  pushNotifications: boolean;
-  stateTransitionHistory: boolean;
-}
-
-export interface A2AAgent {
-  serviceName: string;
-  agentName: string;
-  description: string;
-  version: string;
-  agentCardUri: string;
-  healthy: boolean;
-  errorMessage?: string;
-  capabilities: AgentCapabilities;
-}
-
 export interface PlatformMetrics {
   conversationId: string;
   chatModel: string;
   embeddingModel: string;
   vectorStoreName: string;
   mcpServers: McpServer[];
-  a2aAgents: A2AAgent[];
   memoryType: string;
 }

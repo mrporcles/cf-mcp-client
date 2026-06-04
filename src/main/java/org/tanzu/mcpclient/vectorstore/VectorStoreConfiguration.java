@@ -9,13 +9,10 @@ import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.filter.Filter;
 import org.springframework.ai.vectorstore.pgvector.PgVectorStore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Conditional;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
+import org.springframework.context.annotation.*;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.lang.NonNull;
 import org.tanzu.mcpclient.model.ModelDiscoveryService;
+import org.springframework.lang.NonNull;
 
 import java.util.List;
 
@@ -28,11 +25,9 @@ public class VectorStoreConfiguration {
     private static final Logger logger = LoggerFactory.getLogger(VectorStoreConfiguration.class);
 
     private final ModelDiscoveryService modelDiscoveryService;
-    private final Environment environment;
 
-    public VectorStoreConfiguration(ModelDiscoveryService modelDiscoveryService, Environment environment) {
+    public VectorStoreConfiguration(ModelDiscoveryService modelDiscoveryService) {
         this.modelDiscoveryService = modelDiscoveryService;
-        this.environment = environment;
     }
 
     @Bean
@@ -59,18 +54,24 @@ public class VectorStoreConfiguration {
             logger.info("No embedding model configured, using default dimensions: {}", dimensions);
         }
 
-        boolean schemaAlreadyExists = DatabaseAvailabilityUtil.isVectorStoreSchemaPresent(environment);
-        boolean shouldInitializeSchema = !schemaAlreadyExists;
-        logger.info("Vector store schema initialization: schemaExists={}, initializeSchema={}",
-                schemaAlreadyExists, shouldInitializeSchema);
+        // Get environment variable for table name suffix
+        String envSuffix = System.getenv("CF_USERNAME");
+        String tableName = "vector_store";
+        if (envSuffix != null && !envSuffix.trim().isEmpty()) {
+            // Convert dashes to underscores and make lowercase for valid table name
+            String sanitizedSuffix = envSuffix.trim().toLowerCase().replace("-", "_");
+            tableName = "vector_store_" + sanitizedSuffix;
+        }
+        
+        logger.info("Using vector store table name: {}", tableName);
 
         return PgVectorStore.builder(jdbcTemplate, embeddingModel)
                 .dimensions(dimensions)
                 .distanceType(COSINE_DISTANCE)
                 .indexType(HNSW)
-                .initializeSchema(shouldInitializeSchema)
+                .initializeSchema(true)
                 .schemaName("public")
-                .vectorTableName("vector_store")
+                .vectorTableName(tableName)
                 .maxDocumentBatchSize(10000)
                 .build();
     }

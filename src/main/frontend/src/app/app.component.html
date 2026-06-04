@@ -30,10 +30,6 @@
     <app-mcp-servers-panel
       [metrics]="metrics()">
     </app-mcp-servers-panel>
-    <app-agents-panel
-      [metrics]="metrics()"
-      (messageSent)="onAgentMessageSent($event.agent, $event.message)">
-    </app-agents-panel>
     <app-memory-panel
       [metrics]="metrics()">
     </app-memory-panel>
